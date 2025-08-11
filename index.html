@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Copy, 
   Check, 
@@ -14,6 +14,7 @@ import {
 
 const YearbookCaptionGenerator = () => {
   // --- STATE MANAGEMENT ---
+  const [mounted, setMounted] = useState(false);
   const [input, setInput] = useState('');
   const [tone, setTone] = useState(50); // 0-100 scale
   const [creativity, setCreativity] = useState(50);
@@ -28,6 +29,15 @@ const YearbookCaptionGenerator = () => {
 
   // --- REFS ---
   const fileInputRef = useRef(null);
+
+  // Prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // or a loading spinner
+  }
 
   // --- HELPER FUNCTIONS for UI labels ---
   const getToneLabel = (value) => {
@@ -50,19 +60,26 @@ const YearbookCaptionGenerator = () => {
 
   // --- IMAGE HANDLING ---
   const handleImageUpload = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size must be less than 5MB');
+        if (typeof window !== 'undefined') {
+          alert('Image size must be less than 5MB');
+        }
         return;
       }
       setUploadedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-        analyzeImage(file);
-      };
-      reader.readAsDataURL(file);
+      
+      if (typeof window !== 'undefined' && window.FileReader) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            setImagePreview(e.target.result);
+            analyzeImage(file);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -133,8 +150,11 @@ const YearbookCaptionGenerator = () => {
   // --- INTERACTION HANDLERS ---
   const copyToClipboard = async (text, index) => {
     try {
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined') return;
+      
       // Try modern clipboard API first
-      if (navigator.clipboard && window.isSecureContext) {
+      if (navigator?.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         setCopiedIndex(index);
         setTimeout(() => setCopiedIndex(-1), 2000);
@@ -144,13 +164,17 @@ const YearbookCaptionGenerator = () => {
         textArea.value = text;
         textArea.style.position = 'fixed';
         textArea.style.left = '-9999px';
+        textArea.style.opacity = '0';
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        document.execCommand('copy');
+        const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        setCopiedIndex(index);
-        setTimeout(() => setCopiedIndex(-1), 2000);
+        
+        if (successful) {
+          setCopiedIndex(index);
+          setTimeout(() => setCopiedIndex(-1), 2000);
+        }
       }
     } catch (err) {
       console.error('Failed to copy text: ', err);
