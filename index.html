@@ -1,7 +1,19 @@
 import React, { useState, useRef } from 'react';
-import { Copy, Check, ThumbsUp, ThumbsDown, Shield, Info, Sparkles, Upload, X, Image } from 'lucide-react';
+import { 
+  Copy, 
+  Check, 
+  ThumbsUp, 
+  ThumbsDown, 
+  Shield, 
+  Info, 
+  Sparkles, 
+  Upload, 
+  X, 
+  Image 
+} from 'lucide-react';
 
 const YearbookCaptionGenerator = () => {
+  // --- STATE MANAGEMENT ---
   const [input, setInput] = useState('');
   const [tone, setTone] = useState(50); // 0-100 scale
   const [creativity, setCreativity] = useState(50);
@@ -13,9 +25,11 @@ const YearbookCaptionGenerator = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
-  const textAreaRef = useRef(null);
+
+  // --- REFS ---
   const fileInputRef = useRef(null);
 
+  // --- HELPER FUNCTIONS for UI labels ---
   const getToneLabel = (value) => {
     if (value < 33) return 'Formal';
     if (value < 67) return 'Balanced';
@@ -34,15 +48,15 @@ const YearbookCaptionGenerator = () => {
     return 'Extended (100-150 words)';
   };
 
+  // --- IMAGE HANDLING ---
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      // Check file size (limit to 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size must be less than 5MB');
+        // Using a custom alert or modal in a real app would be better.
+        console.error('Image size must be less than 5MB');
         return;
       }
-
       setUploadedImage(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -55,13 +69,10 @@ const YearbookCaptionGenerator = () => {
 
   const analyzeImage = async (file) => {
     setIsAnalyzingImage(true);
-    
     // Simulate AI image analysis
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
     // Mock image analysis result
     const mockAnalysis = "Students gathered in the school auditorium during what appears to be a drama club performance or rehearsal. The stage lighting creates dramatic shadows while performers in costume engage with their audience. The scene captures the energy and creativity of student theatrical arts, with props and set pieces visible in the background indicating a well-prepared production.";
-    
     setInput(mockAnalysis);
     setIsAnalyzingImage(false);
   };
@@ -75,6 +86,7 @@ const YearbookCaptionGenerator = () => {
     }
   };
 
+  // --- CORE LOGIC ---
   const sanitizeInput = (text) => {
     // Replace potential names/identifiers with placeholders for privacy
     return text.replace(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, '[Student]')
@@ -83,340 +95,266 @@ const YearbookCaptionGenerator = () => {
 
   const generateCaptions = async () => {
     if (!input.trim()) return;
-    
     setIsGenerating(true);
-    
-    // Simulate AI generation with privacy-safe processing
     const sanitizedInput = sanitizeInput(input);
     const toneStyle = getToneLabel(tone);
     const creativityStyle = getCreativityLabel(creativity);
-    
+
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Mock AI responses (in real app, this would be API call)
+
+    // Mock AI responses (in a real app, this would be an API call)
     const mockCaptions = generateMockCaptions(sanitizedInput, toneStyle, creativityStyle, length, includeAttribution);
-    
     setCaptions(mockCaptions);
     setIsGenerating(false);
   };
 
   const generateMockCaptions = (sanitizedInput, toneStyle, creativityStyle, length, attribution) => {
+    // This mock function provides sample captions based on settings.
     const baseCaptions = {
       short: [
         "Students showcase their theatrical talents during the spring drama production. The carefully crafted set design and professional lighting create an immersive experience for the audience. Cast members demonstrate months of preparation through their confident performances. This annual tradition continues to highlight the artistic abilities within our school community, bringing together students from various grade levels.",
         "The drama club's latest production brings together diverse talents from across our school. Elaborate costumes and thoughtful staging reflect the dedication of both performers and crew members. Students develop confidence and creativity through their participation in theatrical arts. The supportive audience atmosphere encourages artistic expression and builds lasting memories for all involved participants.",
-        "Our students transform the auditorium into a captivating theatrical venue through their creative vision. The production showcases the collaborative efforts of actors, directors, and technical crew working together seamlessly. Months of rehearsals culminate in this polished performance that demonstrates exceptional commitment to the arts. This experience builds leadership skills and artistic confidence among participating students."
       ],
       standard: [
         "Students demonstrate exceptional theatrical abilities during this year's spring drama production, bringing classic literature to life through careful interpretation and skilled performance. The elaborate set design and professional lighting equipment create an immersive atmosphere that transports audiences into the story's world. Cast members have dedicated countless hours to perfecting their craft, working closely with directors and fellow performers to ensure a cohesive and engaging presentation. This annual tradition not only entertains but also provides valuable opportunities for creative expression, public speaking development, and collaborative teamwork that extends far beyond the theater walls.",
         "The drama club's ambitious production showcases the remarkable talent and dedication of our student performers across multiple grade levels. From intricate costume design to sophisticated sound engineering, every aspect reflects months of careful planning and artistic collaboration. Students develop confidence, creativity, and leadership skills through their participation in this comprehensive theatrical experience. The supportive environment encourages risk-taking and artistic growth while building lasting friendships and memories that will be treasured throughout their academic journey and beyond.",
-        "Our talented students transform the school auditorium into a professional theater venue through their exceptional artistic vision and technical expertise. The production represents a culmination of creative writing, dramatic interpretation, musical composition, and visual arts working together in perfect harmony. Participating students gain invaluable experience in public performance, team collaboration, and creative problem-solving while entertaining their peers and community members. This meaningful tradition continues to inspire future generations of artists and performers within our educational community."
       ],
       extended: [
         "Students deliver an outstanding theatrical performance that demonstrates months of dedicated preparation and artistic development during this year's highly anticipated spring drama production. The carefully choreographed scenes, professionally designed lighting systems, and meticulously crafted set pieces create an immersive experience that captivates audiences from the opening curtain to the final bow. Cast and crew members representing various academic disciplines and grade levels collaborate seamlessly to bring this ambitious production to life, showcasing not only individual talents but also the power of collective creativity and teamwork. Through their participation in this comprehensive theatrical experience, students develop essential life skills including public speaking confidence, creative problem-solving abilities, leadership qualities, and collaborative communication techniques that will serve them well in future academic and professional endeavors while creating lasting memories and friendships that extend far beyond their high school years.",
-        "The drama club's exceptional production represents a remarkable achievement in student-led artistic collaboration, featuring elaborate costume designs, sophisticated sound engineering, innovative staging techniques, and compelling dramatic performances that rival professional theater productions. Students from diverse academic backgrounds unite their unique talents and perspectives to create this memorable theatrical experience, working tirelessly behind the scenes and on stage to ensure every detail meets the highest artistic standards. This annual tradition provides invaluable opportunities for creative expression, personal growth, and skill development while fostering a supportive community environment that encourages artistic risk-taking and innovative thinking. The dedication and passion displayed by these young performers inspire not only their immediate audience but also future generations of student artists who will continue this proud tradition of excellence in theatrical arts.",
-        "Our exceptionally talented students demonstrate the transformative power of collaborative artistic expression through this professionally executed theatrical production that showcases months of intensive preparation, creative development, and technical mastery. The comprehensive nature of this production encompasses multiple artistic disciplines including dramatic performance, musical composition, visual arts, technical theater, and creative writing, providing participating students with a well-rounded educational experience that extends far beyond traditional classroom learning. Through their involvement in this ambitious undertaking, students develop crucial leadership skills, creative confidence, communication abilities, and teamwork strategies while creating meaningful connections with peers who share their passion for the performing arts. This remarkable achievement not only entertains and inspires the school community but also establishes a lasting legacy of artistic excellence that will continue to influence and motivate future generations of student performers and creators."
+        "The drama club's exceptional production represents a remarkable achievement in student-led artistic collaboration, featuring elaborate costume designs, sophisticated sound engineering, innovative staging techniques, and compelling dramatic performances that rival professional theater productions. Students from diverse academic backgrounds unite their unique talents and perspectives to create this memorable theatrical experience, working tirelessly behind the scenes and on stage to ensure every detail meets the highest artistic standards. This annual tradition provides invaluable opportunities for creative expression, personal growth, and skill development while fostering a supportive community environment that encourages artistic risk-taking and innovative thinking.",
       ]
     };
-    
     const selectedCaptions = baseCaptions[length] || baseCaptions.standard;
-    
-    const withAttribution = selectedCaptions.map(caption => 
-      attribution ? caption + ' (Caption based on advisor notes)' : caption
+    return selectedCaptions.map(caption =>
+      attribution ? `${caption} (Caption based on advisor notes)` : caption
     );
-    
-    return withAttribution;
   };
-
-  const copyToClipboard = async (text, index) => {
+  
+  // --- INTERACTION HANDLERS ---
+  
+  /**
+   * FIX: Replaced navigator.clipboard.writeText with a more robust method.
+   * This approach creates a temporary textarea, adds the text to it,
+   * selects the text, and uses the document.execCommand('copy') API.
+   * This is more compatible across different browsers and environments (like iframes).
+   */
+  const copyToClipboard = (text, index) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed'; // Prevent scrolling to bottom of page in MS Edge.
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
     try {
-      await navigator.clipboard.writeText(text);
+      document.execCommand('copy');
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(-1), 2000);
     } catch (err) {
-      console.error('Failed to copy text');
+      console.error('Failed to copy text: ', err);
     }
+    document.body.removeChild(textArea);
   };
 
   const provideFeedback = (index, isPositive) => {
-    // In real app, this would send feedback to improve AI
+    // In a real app, this would send feedback to improve the AI model.
     console.log(`Feedback for caption ${index}: ${isPositive ? 'positive' : 'negative'}`);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Yearbook Caption AI</h1>
-          </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Generate professional yearbook captions instantly. Your content stays private and secure.
-          </p>
-          
-          {/* Privacy Indicator */}
-          <div className="flex items-center justify-center gap-2 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg max-w-md mx-auto">
-            <Shield className="w-4 h-4 text-green-600" />
-            <span className="text-sm text-green-700">Privacy Protected - No personal data stored</span>
-          </div>
-        </div>
+    <>
+      {/* FIX: Added a style block to define the custom styles for the range slider.
+        The className 'slider' was used in the input but was not defined, 
+        causing it to fall back to the default browser appearance.
+        These styles customize the slider's track and thumb for a better look.
+      */}
+      <style>{`
+        .slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: #3b82f6; /* blue-600 */
+          cursor: pointer;
+          border-radius: 9999px;
+          margin-top: -7px; /* Center the thumb on the track */
+        }
+        .slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: #3b82f6; /* blue-600 */
+          cursor: pointer;
+          border-radius: 9999px;
+        }
+      `}</style>
+      <div className="min-h-screen bg-gray-50 p-4 font-sans">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <header className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="w-8 h-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900">Yearbook Caption AI</h1>
+            </div>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Generate professional yearbook captions instantly. Your content stays private and secure.
+            </p>
+            <div className="flex items-center justify-center gap-2 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg max-w-md mx-auto">
+              <Shield className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-green-700">Privacy Protected - No personal data stored</span>
+            </div>
+          </header>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Input Section */}
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900">Upload Photo & Description</h2>
-            
-            {/* Photo Upload Section */}
-            <div className="mb-6">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="hidden"
-                id="photo-upload"
-              />
+          <main className="grid lg:grid-cols-2 gap-8">
+            {/* Input Section */}
+            <section className="bg-white rounded-xl shadow-sm border p-6">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Upload Photo & Description</h2>
               
-              {!imagePreview ? (
-                <label
-                  htmlFor="photo-upload"
-                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
-                >
-                  <Upload className="w-12 h-12 text-gray-400 mb-4" />
-                  <p className="text-gray-600 text-center">
-                    <span className="font-medium">Click to upload photo</span>
-                    <br />
-                    <span className="text-sm">Supports JPG, PNG, GIF (max 5MB)</span>
-                  </p>
-                </label>
-              ) : (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Uploaded yearbook photo"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={removeImage}
-                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                  {isAnalyzingImage && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                      <div className="flex items-center gap-2 text-white">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Analyzing photo...
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            
-            <textarea
-              ref={textAreaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Describe what's happening in the yearbook photo... (e.g., 'Students performing in the spring musical, showing their theatrical talents on stage')"
-              className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              maxLength={500}
-            />
-            <div className="text-sm text-gray-500 mt-2">
-              {input.length}/500 characters
-            </div>
-
-            {/* Controls */}
-            <div className="space-y-6 mt-6">
-              {/* Tone Slider */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <label className="font-medium text-gray-700">Tone</label>
-                  <div className="group relative">
-                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      Formal = Professional • Balanced = Standard • Casual = Relaxed
-                    </div>
-                  </div>
-                  <span className="text-sm text-blue-600 font-medium">{getToneLabel(tone)}</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={tone}
-                    onChange={(e) => setTone(parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Formal</span>
-                    <span>Balanced</span>
-                    <span>Casual</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Creativity Slider */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <label className="font-medium text-gray-700">Creativity</label>
-                  <div className="group relative">
-                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      Factual = Just the facts • Standard = Balanced • Creative = More flair
-                    </div>
-                  </div>
-                  <span className="text-sm text-blue-600 font-medium">{getCreativityLabel(creativity)}</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={creativity}
-                    onChange={(e) => setCreativity(parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Factual</span>
-                    <span>Standard</span>
-                    <span>Creative</span>
-                  </div>
-                </div>
-              </div>
-
-            <div>
-              <label className="font-medium text-gray-700 mb-3 block">Caption Length</label>
-              <div className="space-y-2">
-                {['short', 'standard', 'extended'].map((option) => (
-                  <label key={option} className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="length"
-                      value={option}
-                      checked={length === option}
-                      onChange={(e) => setLength(e.target.value)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700">
-                      {getLengthLabel(option)}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-              {/* Attribution Toggle */}
-              <div className="flex items-center gap-3">
+              {/* Photo Upload */}
+              <div className="mb-6">
                 <input
-                  type="checkbox"
-                  id="attribution"
-                  checked={includeAttribution}
-                  onChange={(e) => setIncludeAttribution(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  className="hidden"
+                  id="photo-upload"
                 />
-                <label htmlFor="attribution" className="font-medium text-gray-700">
-                  Include advisor attribution
-                </label>
+                {!imagePreview ? (
+                  <label htmlFor="photo-upload" className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                    <Upload className="w-12 h-12 text-gray-400 mb-4" />
+                    <p className="text-gray-600 text-center">
+                      <span className="font-medium">Click to upload photo</span><br />
+                      <span className="text-sm">Supports JPG, PNG, GIF (max 5MB)</span>
+                    </p>
+                  </label>
+                ) : (
+                  <div className="relative">
+                    <img src={imagePreview} alt="Uploaded yearbook photo" className="w-full h-48 object-cover rounded-lg" />
+                    <button onClick={removeImage} className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                    {isAnalyzingImage && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                        <div className="flex items-center gap-2 text-white">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Analyzing photo...
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
 
-            {/* Generate Button */}
-            <button
-              onClick={generateCaptions}
-              disabled={(!input.trim() && !uploadedImage) || isGenerating || isAnalyzingImage}
-              className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            >
-              {isGenerating ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Generating Captions...
+              {/* Text Input */}
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Describe what's happening in the yearbook photo... (e.g., 'Students performing in the spring musical, showing their theatrical talents on stage')"
+                className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                maxLength={500}
+              />
+              <div className="text-right text-sm text-gray-500 mt-2">
+                {input.length}/500
+              </div>
+              
+              {/* Controls */}
+              <div className="space-y-6 mt-6">
+                {/* Tone Slider */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="font-medium text-gray-700">Tone</label>
+                    <div className="group relative">
+                      <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Formal = Professional • Balanced = Standard • Casual = Relaxed
+                      </div>
+                    </div>
+                    <span className="text-sm text-blue-600 font-medium">{getToneLabel(tone)}</span>
+                  </div>
+                  <input type="range" min="0" max="100" value={tone} onChange={(e) => setTone(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Formal</span><span>Balanced</span><span>Casual</span>
+                  </div>
+                </div>
+
+                {/* Creativity Slider */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="font-medium text-gray-700">Creativity</label>
+                     <div className="group relative">
+                      <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-gray-800 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Factual = Just the facts • Standard = Balanced • Creative = More flair
+                      </div>
+                    </div>
+                    <span className="text-sm text-blue-600 font-medium">{getCreativityLabel(creativity)}</span>
+                  </div>
+                  <input type="range" min="0" max="100" value={creativity} onChange={(e) => setCreativity(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Factual</span><span>Standard</span><span>Creative</span>
+                  </div>
+                </div>
+
+                {/* Length Radio */}
+                <div>
+                  <label className="font-medium text-gray-700 mb-3 block">Caption Length</label>
+                  <div className="space-y-2">
+                    {['short', 'standard', 'extended'].map((option) => (
+                      <label key={option} className="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" name="length" value={option} checked={length === option} onChange={(e) => setLength(e.target.value)} className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                        <span className="text-gray-700">{getLengthLabel(option)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Attribution Toggle */}
+                <div className="flex items-center gap-3">
+                  <input type="checkbox" id="attribution" checked={includeAttribution} onChange={(e) => setIncludeAttribution(e.target.checked)} className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                  <label htmlFor="attribution" className="font-medium text-gray-700">Include advisor attribution</label>
+                </div>
+              </div>
+
+              {/* Generate Button */}
+              <button
+                onClick={generateCaptions}
+                disabled={(!input.trim() && !uploadedImage) || isGenerating || isAnalyzingImage}
+                className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Generating Captions...
+                  </>
+                ) : ( 'Generate Captions' )}
+              </button>
+            </section>
+
+            {/* Results Section */}
+            <section className="bg-white rounded-xl shadow-sm border p-6">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Generated Captions</h2>
+              {captions.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 flex flex-col items-center justify-center h-full">
+                  <Image className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p>Upload a photo or enter a description to see AI-powered suggestions here.</p>
+                  <p className="text-sm mt-2">Captions will be 50-150 words to meet yearbook standards.</p>
                 </div>
               ) : (
-                'Generate Captions'
-              )}
-            </button>
-          </div>
-
-          {/* Results Section */}
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900">Generated Captions</h2>
-            
-            {captions.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <Image className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>Upload a yearbook photo or enter a description, then click "Generate Captions" to see AI-powered suggestions.</p>
-                <p className="text-sm mt-2">Captions will be 50-150 words to meet yearbook standards.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {captions.map((caption, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-                    <p className="text-gray-800 mb-3 leading-relaxed text-sm">{caption}</p>
-                    <div className="text-xs text-gray-500 mb-3">
-                      Word count: {caption.split(' ').length} words
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => provideFeedback(index, true)}
-                          className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Good caption"
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => provideFeedback(index, false)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Needs improvement"
-                        >
-                          <ThumbsDown className="w-4 h-4" />
-                        </button>
+                <div className="space-y-4">
+                  {captions.map((caption, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                      <p className="text-gray-800 mb-3 leading-relaxed text-sm">{caption}</p>
+                      <div className="text-xs text-gray-500 mb-3">
+                        Word count: {caption.split(' ').length}
                       </div>
-                      
-                      <button
-                        onClick={() => copyToClipboard(caption, index)}
-                        className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                      >
-                        {copiedIndex === index ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-4 h-4" />
-                            Copy
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-12 p-6 bg-white rounded-xl shadow-sm border">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Shield className="w-5 h-5 text-green-600" />
-            <span className="font-medium text-gray-900">Privacy First Design</span>
-          </div>
-          <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-            This tool processes your content locally when possible and never stores personal information. 
-            All student identifiers are automatically anonymized before AI processing.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default YearbookCaptionGenerator;
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-2">
+                          <button onClick={() => provideFeedback(index, true)} className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Good caption">
+                            <ThumbsUp className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => provideFeedback(index, false)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Needs improvement">
+                            <ThumbsDown className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <button onClick={() => copyToClipboard(caption, index)} className="flex items-center gap-2 p
